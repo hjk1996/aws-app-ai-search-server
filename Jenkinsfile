@@ -13,12 +13,30 @@ pipeline {
                 // GitHub에서 최신 코드를 체크아웃
                 checkout scm
             }
+
+            post {
+                success {
+                    echo "Success Checkout"
+                }
+                failure {
+                    echo "Failure Checkout"
+                }
+            }
         }
         stage('Build Docker Image') {
             steps {
                 // Docker 이미지 빌드
                 sh "docker build -t ${ECR_URL}:${currentBuild.number} ."
                 sh "docker tag ${ECR_URL}:${currentBuild.number} ${ECR_URL}:latest"
+            }
+
+            post {
+                success {
+                    echo "Success Docker Image Build"
+                }
+                failure {
+                    echo "Failure Docker Image Build"
+                }
             }
         }
         stage('Push to ECR') {
@@ -28,6 +46,15 @@ pipeline {
                 // 이미지 푸시
                 sh "docker push ${ECR_URL}:${currentBuild.number}"
                 sh "docker push ${ECR_URL}:latest"
+            }
+
+            post {
+                success {
+                    echo "Success Push to ECR"
+                }
+                failure {
+                    echo "Failure Push to ECR"
+                }
             }
         }
     }
