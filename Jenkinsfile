@@ -49,6 +49,12 @@ pipeline {
             }
 
             post {
+
+                always {
+                    sh "docker image rm ${ECR_URL}:${currentBuild.number}"
+                    sh "docker image rm ${ECR_URL}:latest"
+                }
+
                 success {
                     echo "Success Push to ECR"
                 }
