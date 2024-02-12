@@ -78,7 +78,7 @@ pipeline {
                 sh "sed -i 's@${ECR_URL}:.*@${ECR_URL}:${currentBuild.number}@g' ingress/app_group/face_search/face_search_deployment.yml"
                 echo "edit k8s deployment manifest file"
                 sh "git add ."
-                sh "git commit -m 'fix:${ECR_REPO_URL} ${currentBuild.number} image versioning'"
+                sh "git commit -m 'fix:${ECR_URL} ${currentBuild.number} image versioning'"
                 sh "git branch -M main"
                 sh "git remote remove origin"
                 sh "git remote add origin ${GITSSHADD}"
