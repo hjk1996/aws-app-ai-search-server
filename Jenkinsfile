@@ -2,8 +2,11 @@ pipeline {
     agent any
 
     environment {
-
         ECR_URL = "109412806537.dkr.ecr.us-east-1.amazonaws.com/app-face-search"
+        GITCREDENTIAL = "khj-github" 
+        GITSSHADD = "git@github.com:hjk1996/aws-app-eks-manifests.git"
+        GITEMAIL = "dunhill741@naver.com"
+        GITNAME = "hjk1996"
     }
 
 
@@ -62,5 +65,36 @@ pipeline {
                 }
             }
         }
+
+        stage('k8s manifest file update') {
+      	   steps {
+                git credentialsId: GITCREDENTIAL,
+                    url: GITSSHADD,
+                    branch: 'main'
+            
+                // 이미지 태그 변경 후 메인 브랜치에 푸시
+                sh "git config --global user.email ${GITEMAIL}"
+                sh "git config --global user.name ${GITNAME}"
+                sh "sed -i 's@${ECR_URL}:.*@${ECR_URL}:${currentBuild.number}@g' ingress/app_group/face_search/face_search_deployment.yml"
+                echo "edit k8s deployment manifest file"
+                sh "git add ."
+                sh "git commit -m 'fix:${ECR_REPO_URL} ${currentBuild.number} image versioning'"
+                sh "git branch -M main"
+                sh "git remote remove origin"
+                sh "git remote add origin ${GITSSHADD}"
+                echo "push to main branch"
+                sh "git push -u origin main"
+
+      	   }
+      	   post {
+                failure {
+                   echo 'k8s manifest file update failure'
+                }
+                success {
+                    echo 'k8s manifest file update success'  
+                }
+  	 }
+}
+
     }
 }
