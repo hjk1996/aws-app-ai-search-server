@@ -3,7 +3,7 @@ pipeline {
 
     environment {
 
-        ECR_URL = "109412806537.dkr.ecr.us-east-1.amazonaws.com/app-image-search"
+        ECR_URL = "109412806537.dkr.ecr.us-east-1.amazonaws.com/app-face-search"
     }
 
 
