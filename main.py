@@ -6,10 +6,9 @@ from fastapi import FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 
 
-session = boto3.Session(profile_name="default")
+session = boto3.Session()
 client = session.client("rekognition")
 app = FastAPI()
-
 
 origins = [
     "http://localhost",
