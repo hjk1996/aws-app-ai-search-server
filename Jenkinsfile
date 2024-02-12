@@ -76,7 +76,7 @@ pipeline {
                 sh "git config --global user.email ${GITEMAIL}"
                 sh "git config --global user.name ${GITNAME}"
                 sh "sed -i 's@${ECR_URL}:.*@${ECR_URL}:${currentBuild.number}@g' ingress/app_group/face_search/face_search_deployment.yaml"
-                echo "edit k8s deployment manifest file"
+                echo "edit k8s deployment manifest file!"
                 sh "git checkout main"
                 sh "git add ."
                 sh "git commit -m 'fix:${ECR_URL}:${currentBuild.number} image versioning'"
