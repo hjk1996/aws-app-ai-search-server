@@ -32,10 +32,10 @@ pipeline {
 
             post {
                 success {
-                    echo "Success Docker Image Build"
+                    echo "Success Docker Image Build!"
                 }
                 failure {
-                    echo "Failure Docker Image Build"
+                    echo "Failure Docker Image Build!"
                 }
             }
         }
