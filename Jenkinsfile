@@ -16,10 +16,10 @@ pipeline {
 
             post {
                 success {
-                    echo "Success Checkout"
+                    echo "Success Checkout!"
                 }
                 failure {
-                    echo "Failure Checkout"
+                    echo "Failure Checkout!"
                 }
             }
         }
