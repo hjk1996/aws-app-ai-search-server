@@ -47,3 +47,7 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
 
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("search/faces/health_check")
+async def health_check():
+    return {"status": "ok"}
