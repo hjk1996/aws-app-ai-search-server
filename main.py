@@ -1,39 +1,50 @@
+from typing import Annotated
+
+
 import boto3
-from glob import glob
-from pprint import pprint
-
-from models import Label, Text, FaceDetails, ImageMetadata
+from fastapi import FastAPI, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 
 
-if __name__ == "__main__":
-    session = boto3.Session(profile_name="default")
-    client = session.client("rekognition")
+session = boto3.Session(profile_name="default")
+client = session.client("rekognition")
+app = FastAPI()
 
-    sample_images = glob("samples/*")
 
-    for image in sample_images:
-        with open(image, "rb") as imageFile:
-            image_bytes = imageFile.read()
-            # print("--------------------")
-            # response_1 = client.detect_labels(
-            #     Image={"Bytes": image_bytes}, MaxLabels=20, MinConfidence=90
-            # )
-            # labels = response_1["Labels"]
-            # labels = [Label.model_validate(label) for label in labels]
-            # pprint(labels)
-            # response_2 = client.detect_text(Image={"Bytes": image_bytes})
-            # texts = response_2["TextDetections"]
-            # texts = [Text.model_validate(text) for text in texts]
-            response_3 = client.detect_faces(
-                Image={"Bytes": image_bytes}, Attributes=["ALL"]
-            )
-            face_details = response_3["FaceDetails"]
-            face_details = [
-                FaceDetails.model_validate(face_detail) for face_detail in face_details
-            ]
-            pprint(face_details)
-            # image_metadata = ImageMetadata(
-            #     id=image, labels=labels, texts=texts, face_details=face_details
-            # )
-            # pprint(image_metadata.dict())
-            print("--------------------")
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:5000",
+    "https://www.amazonphotoquery.site"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/search/faces")
+async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, Form()]):
+    try:
+        response = client.search_faces_by_image(
+            CollectionId=user_id,
+            Image={"Bytes": file},
+            MaxFaces=20,
+            FaceMatchThreshold=80,
+        )
+        face_matches = response["FaceMatches"]
+
+        if not face_matches:
+            return {"result": []}
+
+        return {
+            "result": [match["Face"]["ExternalImageId"] for match in face_matches],
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
