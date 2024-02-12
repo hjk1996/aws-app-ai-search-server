@@ -11,12 +11,7 @@ client = session.client("rekognition")
 app = FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://localhost:5000",
-    "https://www.amazonphotoquery.site"
+    "*",
 ]
 
 app.add_middleware(
