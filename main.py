@@ -32,7 +32,6 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             FaceMatchThreshold=80,
         )
         face_matches = response["FaceMatches"]
-        client.delete
 
         if not face_matches:
             return {"result": []}
