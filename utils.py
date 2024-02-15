@@ -1,5 +1,9 @@
+import json
+
+
 import boto3
 from botocore.exceptions import ClientError
+
 
 
 def get_secret() -> dict[str, str]:
