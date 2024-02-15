@@ -46,7 +46,7 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             CollectionId=user_id,
             Image={"Bytes": file},
             MaxFaces=20,
-            FaceMatchThreshold=80,
+            FaceMatchThreshold=90,
         )
         face_matches = response["FaceMatches"]
 
