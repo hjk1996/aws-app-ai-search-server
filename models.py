@@ -2,6 +2,14 @@ from pydantic import BaseModel, validator
 from typing import List, Optional
 
 
+# DB Data Model
+class Picture(BaseModel):
+    picture_id: str
+    user_id: str
+    image_url: str
+    content: str
+
+
 # Label Detection
 
 

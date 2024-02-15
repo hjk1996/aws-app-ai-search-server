@@ -1,0 +1,7 @@
+{
+  "user": "admin",
+  "password": "ace12345",
+  "host": "db-ace-instance.crs0m0kcouds.us-east-1.rds.amazonaws.com",
+  "database": "app",
+  "raise_on_warnings": "True"
+}
