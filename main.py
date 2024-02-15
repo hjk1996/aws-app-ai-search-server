@@ -72,4 +72,4 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
 
 @app.get("/search/faces/health_check")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": 200}
