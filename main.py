@@ -57,15 +57,15 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             return {"result": []}
 
         picture_urls: list[str] = [match["Face"]["ExternalImageId"] for match in face_matches]
-        
+
         logger.info(f"Found {len(picture_urls)} matches in Rekognition.: {picture_urls}")
-        
+
         cursor = db.cursor(dictionary=True)
         cursor.execute(
             f"SELECT * FROM Pictures WHERE image_url IN ({','.join(['%s'] * len(picture_urls))})",
             picture_urls,
         )    
-        query_result = cursor.fetchall()
+        query_result = list(set(cursor.fetchall()))
 
         if not query_result:
             raise Exception("Found results in Rekognition but not in the database.")
