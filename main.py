@@ -10,7 +10,7 @@ import mysql.connector
 from utils import get_secret
 
 session = boto3.Session()
-client = session.client("rekognition")
+rekognition = session.client("rekognition")
 mysql_config = get_secret()
 
 db = mysql.connector.connect(
@@ -35,14 +35,11 @@ app.add_middleware(
 )
 
 
-
-
-
 @app.post("/search/faces")
 async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, Form()]):
     try:
         cursor = None
-        response = client.search_faces_by_image(
+        response = rekognition.search_faces_by_image(
             CollectionId=user_id,
             Image={"Bytes": file},
             MaxFaces=20,
@@ -60,18 +57,20 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             picture_urls,
         )    
         query_result = cursor.fetchall()
-        
+
         if not query_result:
             raise Exception("Found results in Rekognition but not in the database.")
-        
+
         for result in query_result:
             result["created_at"] = result["create_at"]
             result.pop("create_at")
-        
+
         return {"result": query_result}
 
+    except rekognition.exceptions.InvalidParameterException as e:
+        return {"error": str(e), "error_type": "InvalidParameterException"}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e), "error_type": type(e).__name__}
     finally:
         if cursor:
             cursor.close()
