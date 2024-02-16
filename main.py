@@ -64,9 +64,9 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
         if not query_result:
             raise Exception("Found results in Rekognition but not in the database.")
         
-        
-        query_result["created_at"] = query_result["create_at"]
-        query_result.pop("create_at")
+        for result in query_result:
+            result["created_at"] = result["create_at"]
+            result.pop("create_at")
         
         return {"result": query_result}
 
