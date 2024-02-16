@@ -60,7 +60,14 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             picture_urls,
         )    
         query_result = cursor.fetchall()
-
+        
+        if not query_result:
+            raise Exception("Found results in Rekognition but not in the database.")
+        
+        
+        query_result["created_at"] = query_result["create_at"]
+        query_result.pop("create_at")
+        
         return {"result": query_result}
 
     except Exception as e:
