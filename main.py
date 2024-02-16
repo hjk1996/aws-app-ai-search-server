@@ -1,5 +1,6 @@
 import json
 from typing import Annotated
+import logging
 
 
 import boto3
@@ -8,6 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 
 from utils import get_secret
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 session = boto3.Session()
 rekognition = session.client("rekognition")
@@ -51,6 +57,9 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
             return {"result": []}
 
         picture_urls: list[str] = [match["Face"]["ExternalImageId"] for match in face_matches]
+        
+        logger.info(f"Found {len(picture_urls)} matches in Rekognition.: {picture_urls}")
+        
         cursor = db.cursor(dictionary=True)
         cursor.execute(
             f"SELECT * FROM Pictures WHERE image_url IN ({','.join(['%s'] * len(picture_urls))})",
