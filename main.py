@@ -26,6 +26,9 @@ from utils import (
 )
 
 
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = "./.cache"
+
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
