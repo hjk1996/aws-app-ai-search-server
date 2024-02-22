@@ -17,7 +17,13 @@ from fastapi import FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 
-from utils import get_secret, get_sentence_embedding, download_pem_file, get_similar_docs, load_model_and_tokenizer
+from utils import (
+    get_secret,
+    get_sentence_embedding,
+    download_pem_file,
+    get_similar_docs,
+    load_model_and_tokenizer,
+)
 
 
 logger = logging.getLogger()
@@ -68,9 +74,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
 
 
 @app.post("/search/semantic")
