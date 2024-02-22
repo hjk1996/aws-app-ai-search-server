@@ -1,4 +1,5 @@
-FROM bitnami/pytorch:2.2.0
+FROM public.ecr.aws/docker/library/python:3.12.2-slim
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 RUN pip install transformers boto3 pymongo fastapi "uvicorn[standard]" requests
 WORKDIR /app
 RUN mkdir /app/.cache
