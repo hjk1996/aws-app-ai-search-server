@@ -15,7 +15,6 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from fastapi import FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-import mysql.connector
 
 from utils import (
     get_secret,
