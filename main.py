@@ -43,7 +43,7 @@ db = mysql.connector.connect(
     host=mysql_config["host"],
     user=mysql_config["username"],
     password=mysql_config["password"],
-    database="app",
+    database=mysql_config["dbname"],
 )
 logger.info("Connected to the database.")
 
@@ -86,7 +86,9 @@ async def search_semantic(
     query: Annotated[str, Form()], user_id: Annotated[str, Form()]
 ):
     try:
-        results = get_similar_docs(mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH)
+        results = get_similar_docs(
+            mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH
+        )
         file_names = []
         captions = {}
 
@@ -141,10 +143,6 @@ async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, F
 
         if not query_result:
             raise Exception("Found results in Rekognition but not in the database.")
-
-        for result in query_result:
-            result["created_at"] = result["create_at"]
-            result.pop("create_at")
 
         return {"result": query_result}
 
