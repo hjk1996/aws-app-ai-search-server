@@ -27,6 +27,9 @@ from utils import (
 
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = "./.cache"
 
+K_VALUE = int(os.environ.get("K", 20))
+EF_SEAERCH = int(os.environ.get("EF_SEARCH", 200))
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -83,7 +86,7 @@ async def search_semantic(
     query: Annotated[str, Form()], user_id: Annotated[str, Form()]
 ):
     try:
-        results = get_similar_docs(mongo_collection, query, user_id)
+        results = get_similar_docs(mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH)
         file_names = []
         captions = {}
 
