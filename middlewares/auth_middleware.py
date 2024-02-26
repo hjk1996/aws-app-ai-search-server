@@ -26,7 +26,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if kid not in self.jwks:
             raise HTTPException(status_code=403, detail="kid not recognized")
         n = self.jwks[kid]
-        public_key = jwk.construct(n).to_pem()
+        public_key = jwk.construct(key_data=n, algorithm="RS256").to_pem()
         try:
             payload = jwt.decode(token, public_key, algorithms=["RS256"])
             return payload
