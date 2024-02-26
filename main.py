@@ -17,7 +17,7 @@ from fastapi import FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 
-from middlewares import jwt_middleware
+from middlewares import AuthMiddleware
 from utils import (
     get_secret,
     get_sentence_embedding,
@@ -82,7 +82,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(
-    jwt_middleware,
+    AuthMiddleware,
+    jwks_url=os.environ["JWKS_URL"]
 )
 
 
