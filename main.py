@@ -129,9 +129,9 @@ async def search_faces(request: Request, file: Annotated[bytes, File()]):
         return {"result": query_result}
 
     except rekognition.exceptions.InvalidParameterException as e:
-        return HTTPException(status_code=400, detail="InvalidParameterException")
+        raise HTTPException(status_code=400, detail="InvalidParameterException")
     except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/search/faces/health_check")
