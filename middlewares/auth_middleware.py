@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -12,6 +13,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app: ASGIApp, jwks_url: str):
         super().__init__(app)
         self.jwks = self.get_jwks(jwks_url)
+        self.logger = logging.getLogger("AuthMiddleware")
+        
 
     @staticmethod
     def get_jwks(url: str) -> dict[str, dict[str, str]]:
@@ -31,6 +34,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         try:
             public_key = jwk.construct(key_data=self.jwks[kid], algorithm="RS256").to_pem()
             payload = jwt.decode(token, public_key, algorithms=["RS256"])
+            self.logger.info(f"Decoded JWT: {payload}")
             return payload
         except JWTError as e:
             raise HTTPException(
