@@ -9,7 +9,7 @@ from transformers import (
 )
 import boto3
 
-from fastapi import FastAPI, File, Form, Request
+from fastapi import FastAPI, File, Form, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from middlewares import AuthMiddleware
 from db import get_db, get_mongo_db
@@ -86,7 +86,7 @@ async def search_semantic(request: Request, query: str):
 
         return {"result": query_results}
     except Exception as e:
-        return {"error": str(e), "error_type": type(e).__name__}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/search/faces")
@@ -121,7 +121,7 @@ async def search_faces(request: Request, file: Annotated[bytes, File()]):
         query_result = cursor.fetchall()
 
         if not query_result:
-            raise Exception("Found results in Rekognition but not in the database.")
+            raise HTTPException(status_code=404, detail="NoMatchesFoundInDB")
 
         if cursor:
             cursor.close()
@@ -129,9 +129,9 @@ async def search_faces(request: Request, file: Annotated[bytes, File()]):
         return {"result": query_result}
 
     except rekognition.exceptions.InvalidParameterException as e:
-        return {"error": str(e), "error_type": "InvalidParameterException"}
+        return HTTPException(status_code=400, detail="InvalidParameterException")
     except Exception as e:
-        return {"error": str(e), "error_type": type(e).__name__}
+        return HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/search/faces/health_check")
