@@ -7,6 +7,6 @@ ADD download_model.py /app
 RUN python download_model.py
 ADD main.py /app
 ADD utils.py /app
-ADD middleware /app/middleware
+ADD middlewares /app/middlewares
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
