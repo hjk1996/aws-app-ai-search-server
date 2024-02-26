@@ -16,6 +16,8 @@ from pymongo.collection import Collection
 from fastapi import FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
+
+from middlewares import AuthMiddleWare
 from utils import (
     get_secret,
     get_sentence_embedding,
@@ -63,6 +65,9 @@ mongo_collection = mongo_db.caption_vector
 logger.info("Connected to the MongoDB.")
 
 
+
+
+
 model, tokenizer = load_model_and_tokenizer()
 logger.info("Loaded the model and tokenizer.")
 
@@ -78,6 +83,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+app.add_middleware(
+    AuthMiddleWare,
 )
 
 
