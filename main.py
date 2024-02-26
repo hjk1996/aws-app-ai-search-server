@@ -14,7 +14,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from middlewares import AuthMiddleware
 from db import get_db, get_mongo_db
 from utils import (
-
     get_similar_docs,
     load_model_and_tokenizer,
 )
@@ -62,7 +61,7 @@ app.add_middleware(AuthMiddleware, jwks_url=os.environ["JWKS_URL"])
 
 
 @app.get("/search/semantic")
-async def search_semantic(request: Request,  query: str):
+async def search_semantic(request: Request, query: str):
     try:
         user_id = request.state.user["user_id"]
         results = get_similar_docs(
@@ -124,15 +123,15 @@ async def search_faces(request: Request, file: Annotated[bytes, File()]):
         if not query_result:
             raise Exception("Found results in Rekognition but not in the database.")
 
+        if cursor:
+            cursor.close()
+
         return {"result": query_result}
 
     except rekognition.exceptions.InvalidParameterException as e:
         return {"error": str(e), "error_type": "InvalidParameterException"}
     except Exception as e:
         return {"error": str(e), "error_type": type(e).__name__}
-    finally:
-        if cursor:
-            cursor.close()
 
 
 @app.get("/search/faces/health_check")
