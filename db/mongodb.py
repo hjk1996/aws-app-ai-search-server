@@ -2,7 +2,7 @@ import os
 import requests
 from pymongo import MongoClient
 
-from .. import utils
+from utils import get_secret 
 
 
 def download_pem_file() -> bool:
@@ -21,7 +21,7 @@ def download_pem_file() -> bool:
 
 
 def get_mongo_db() -> MongoClient:
-    secret = utils.get_secret(os.environ["MONGO_SECRET_NAME"])
+    secret = get_secret(os.environ["MONGO_SECRET_NAME"])
     if not download_pem_file():
         raise Exception("Failed to download the global-bundle.pem file.")
 
