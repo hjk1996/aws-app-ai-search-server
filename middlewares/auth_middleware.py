@@ -48,5 +48,5 @@ class AuthMiddleware(BaseHTTPMiddleware):
             except ValueError:
                 raise HTTPException(status_code=403, detail="Invalid authorization header")
             except HTTPException as e:
-                return e
+                raise e
         return await call_next(request)
