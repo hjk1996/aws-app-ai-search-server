@@ -3,7 +3,7 @@ import os
 
 import mysql.connector
 
-from ..utils import get_secret
+from utils import get_secret
 
 
 def get_db() -> mysql.connector.MySQLConnection:

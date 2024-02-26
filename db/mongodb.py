@@ -2,7 +2,7 @@ import os
 import requests
 from pymongo import MongoClient
 
-from ..utils import (
+from utils import (
     get_secret
 )
 
