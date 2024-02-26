@@ -36,6 +36,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             )
     
     async def dispatch(self, request: Request, call_next):
+        if request.url.path == "/search/faces/health_check":
+            return await call_next(request)
+        
+        
         authorization: str = request.headers.get("Authorization")
         if authorization:
             try:

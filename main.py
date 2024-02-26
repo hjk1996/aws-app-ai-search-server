@@ -13,11 +13,12 @@ import boto3
 from botocore.exceptions import ClientError
 from pymongo import MongoClient
 from pymongo.collection import Collection
-from fastapi import FastAPI, File, Form
+from fastapi import FastAPI, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 
 from middlewares import AuthMiddleware
+from db import get_db, get_mongo_db
 from utils import (
     get_secret,
     get_sentence_embedding,
@@ -39,27 +40,11 @@ logger.setLevel(logging.INFO)
 
 session = boto3.Session()
 rekognition = session.client("rekognition")
-mysql_config = get_secret(os.environ["MYSQL_SECRET_NAME"])
-
-db = mysql.connector.connect(
-    host=mysql_config["host"],
-    user=mysql_config["username"],
-    password=mysql_config["password"],
-    database=mysql_config["dbname"],
-)
+db = get_db()
 logger.info("Connected to the database.")
 
-secret = get_secret(os.environ["MONGO_SECRET_NAME"])
-logger.info("Got the secret from Secrets Manager.")
 
-if download_pem_file():
-    logger.info("Downloaded the global-bundle.pem file.")
-else:
-    raise Exception("Failed to download the global-bundle.pem file.")
-
-mongo_client = MongoClient(
-    f"mongodb://{secret['username']}:{secret['password']}@{secret['host']}:{secret['port']}/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
-)
+mongo_client = get_mongo_db()
 mongo_db = mongo_client.image_metadata
 mongo_collection = mongo_db.caption_vector
 logger.info("Connected to the MongoDB.")
@@ -81,17 +66,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(
-    AuthMiddleware,
-    jwks_url=os.environ["JWKS_URL"]
-)
+app.add_middleware(AuthMiddleware, jwks_url=os.environ["JWKS_URL"])
 
 
-@app.post("/search/semantic")
-async def search_semantic(
-    query: Annotated[str, Form()], user_id: Annotated[str, Form()]
-):
+@app.get("/search/semantic")
+async def search_semantic(request: Request,  query: str):
     try:
+        user_id = request.state.user["user_id"]
         results = get_similar_docs(
             mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH
         )
@@ -118,8 +99,9 @@ async def search_semantic(
 
 
 @app.post("/search/faces")
-async def search_faces(file: Annotated[bytes, File()], user_id: Annotated[str, Form()]):
+async def search_faces(request: Request, file: Annotated[bytes, File()]):
     try:
+        user_id = request.state.user["user_id"]
         cursor = None
         response = rekognition.search_faces_by_image(
             CollectionId=user_id,
