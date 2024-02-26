@@ -35,7 +35,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 status_code=403, detail="Invalid authentication credentials"
             )
     
-    async def jwt_middleware(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next):
         authorization: str = request.headers.get("Authorization")
         if authorization:
             try:
