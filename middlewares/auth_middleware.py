@@ -15,18 +15,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
 
     @staticmethod
-    def get_jwks(url: str) -> dict[str, str]:
+    def get_jwks(url: str) -> dict[str, dict[str, str]]:
         response = requests.get(url).json()
         keys = response["keys"]
-        return {key["kid"]: key["n"] for key in keys}
+        return {key["kid"]: {"n": key["n"], "e": key["e"], "kty": key["kty"]} for key in keys}
 
     def decode_jwt(self, token: str):
         unverified_header = jwt.get_unverified_headers(token)
         kid = unverified_header["kid"]
         if kid not in self.jwks:
             raise HTTPException(status_code=403, detail="kid not recognized")
-        n = self.jwks[kid]
-        public_key = jwk.construct(key_data=n, algorithm="RS256").to_pem()
+        public_key = jwk.construct(key_data=self.jwks[kid], algorithm="RS256").to_pem()
         try:
             payload = jwt.decode(token, public_key, algorithms=["RS256"])
             return payload
