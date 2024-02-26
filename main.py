@@ -1,4 +1,3 @@
-import json
 import os
 from typing import Annotated
 import logging
@@ -8,21 +7,14 @@ from transformers import (
     AutoTokenizer,
     AutoModel,
 )
-import requests
 import boto3
-from botocore.exceptions import ClientError
-from pymongo import MongoClient
-from pymongo.collection import Collection
+
 from fastapi import FastAPI, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
-import mysql.connector
-
 from middlewares import AuthMiddleware
 from db import get_db, get_mongo_db
 from utils import (
-    get_secret,
-    get_sentence_embedding,
-    download_pem_file,
+
     get_similar_docs,
     load_model_and_tokenizer,
 )

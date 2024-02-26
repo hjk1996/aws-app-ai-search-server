@@ -40,10 +40,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         
         
-        authorization: str = request.headers.get("Authorization")
-        if authorization:
+        token: str = request.headers.get("Authorization")
+        if token:
             try:
-                token = authorization.split()
                 user_info = self.decode_jwt(token=token)
                 request.state.user = user_info
             except ValueError:
