@@ -63,7 +63,7 @@ app.add_middleware(AuthMiddleware, jwks_url=os.environ["JWKS_URL"])
 @app.get("/search/semantic")
 async def search_semantic(request: Request, query: str):
     try:
-        user_id = request.state.user["user_id"]
+        user_id = request.state.user["username"]
         results = get_similar_docs(
             mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH
         )
@@ -92,7 +92,7 @@ async def search_semantic(request: Request, query: str):
 @app.post("/search/faces")
 async def search_faces(request: Request, file: Annotated[bytes, File()]):
     try:
-        user_id = request.state.user["user_id"]
+        user_id = request.state.user["username"]
         cursor = None
         response = rekognition.search_faces_by_image(
             CollectionId=user_id,
