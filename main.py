@@ -60,6 +60,16 @@ app.add_middleware(
 app.add_middleware(AuthMiddleware, jwks_url=os.environ["JWKS_URL"])
 
 
+@app.post("/search/semantic/reset", status_code=200)
+async def reset_caption(request: Request):
+    try:
+        user_id = request.state.user["username"]
+        mongo_collection.delete_many({"user_id": user_id})
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/search/semantic", status_code=200)
 async def search_semantic(request: Request, query: str):
     try:
@@ -100,6 +110,7 @@ async def reset_face_index(request: Request):
         raise HTTPException(status_code=404, detail="ResourceNotFoundException")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.post("/search/faces", status_code=200)
