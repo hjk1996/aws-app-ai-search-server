@@ -53,14 +53,14 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 app.add_middleware(AuthMiddleware, jwks_url=os.environ["JWKS_URL"])
 
 
-@app.get("/search/semantic")
+@app.get("/search/semantic", status_code=200)
 async def search_semantic(request: Request, query: str):
     try:
         user_id = request.state.user["username"]
@@ -89,7 +89,20 @@ async def search_semantic(request: Request, query: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/search/faces")
+@app.post("/search/faces/reset", status_code=200)
+async def reset_face_index(request: Request):
+    try:
+        user_id = request.state.user["username"]
+        rekognition.delete_collection(CollectionId=user_id)
+        rekognition.create_collection(CollectionId=user_id)
+        return {"status": "success"}
+    except rekognition.exceptions.ResourceNotFoundException as e:
+        raise HTTPException(status_code=404, detail="ResourceNotFoundException")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/search/faces", status_code=200)
 async def search_faces(request: Request, file: Annotated[bytes, File()]):
     try:
         user_id = request.state.user["username"]
@@ -130,6 +143,8 @@ async def search_faces(request: Request, file: Annotated[bytes, File()]):
 
     except rekognition.exceptions.InvalidParameterException as e:
         raise HTTPException(status_code=400, detail="InvalidParameterException")
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

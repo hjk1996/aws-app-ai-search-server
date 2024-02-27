@@ -1,11 +1,10 @@
-import os
 import logging
 import requests
 from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
-from jose import jwt, jwk, JWTError
+from jose import jwt, jwk, JWTError, ExpiredSignatureError
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -14,7 +13,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.jwks = self.get_jwks(jwks_url)
         self.logger = logging.getLogger("AuthMiddleware")
-        
 
     @staticmethod
     def get_jwks(url: str) -> dict[str, dict[str, str]]:
@@ -25,17 +23,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
             for key in keys
         }
 
-
     def decode_jwt(self, token: str):
         unverified_header = jwt.get_unverified_headers(token)
         kid = unverified_header["kid"]
         if kid not in self.jwks:
             raise HTTPException(status_code=403, detail="kid not recognized")
         try:
-            public_key = jwk.construct(key_data=self.jwks[kid], algorithm="RS256").to_pem()
+            public_key = jwk.construct(
+                key_data=self.jwks[kid], algorithm="RS256"
+            ).to_pem()
             payload = jwt.decode(token, public_key, algorithms=["RS256"])
             self.logger.info(f"Decoded JWT: {payload}")
             return payload
+
+        except ExpiredSignatureError as e:
+            raise HTTPException(status_code=403, detail="ExpiredToken")
         except JWTError as e:
             raise HTTPException(
                 status_code=403, detail=f"Invalid authentication credentials: {e}"
