@@ -83,22 +83,12 @@ async def search_semantic(request: Request, query: str):
             k=K_VALUE,
             efSearch=EF_SEAERCH,
         )
-        file_names = []
-        captions = {}
-
-        for result in results:
-            file_name = result["image_url"]
-            file_names.append(file_name)
-            captions[file_name] = result["caption"]
-
+        file_names = [result["file_name"] for result in results]
         cursor = db.cursor(dictionary=True)
         cursor.execute(
             f"SELECT * FROM Pictures WHERE image_url IN ({','.join(['%s'] * len(file_names))})",
         )
         query_results = cursor.fetchall()
-
-        for result in query_results:
-            result["caption"] = captions[result["image_url"]]
 
         return {"result": query_results}
     except Exception as e:

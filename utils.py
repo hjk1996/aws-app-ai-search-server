@@ -76,7 +76,7 @@ def get_similar_docs(
                         "similarity": "euclidean",
                         "k": k,
                         "efSearch": efSearch,
-                    }
+                }
                 }
             }
         },
