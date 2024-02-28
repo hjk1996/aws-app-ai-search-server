@@ -92,6 +92,7 @@ async def search_semantic(request: Request, query: str):
 
         return {"result": query_results}
     except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
