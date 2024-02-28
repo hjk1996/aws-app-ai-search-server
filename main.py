@@ -75,7 +75,13 @@ async def search_semantic(request: Request, query: str):
     try:
         user_id = request.state.user["username"]
         results = get_similar_docs(
-            mongo_collection, query, user_id, k=K_VALUE, efSearch=EF_SEAERCH
+            model=model,
+            tokenizer=tokenizer,
+            collection=mongo_collection,
+            query=query,
+            user_id=user_id,
+            k=K_VALUE,
+            efSearch=EF_SEAERCH,
         )
         file_names = []
         captions = {}
@@ -110,7 +116,6 @@ async def reset_face_index(request: Request):
         raise HTTPException(status_code=404, detail="ResourceNotFoundException")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @app.post("/search/faces", status_code=200)
