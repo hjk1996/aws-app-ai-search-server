@@ -85,9 +85,8 @@ async def search_semantic(request: Request, query: str):
         )
         file_names = [result["file_name"] for result in results]
         cursor = db.cursor(dictionary=True)
-        cursor.execute(
-            f"SELECT * FROM Pictures WHERE image_url IN ({','.join(['%s'] * len(file_names))})",
-        )
+        query = f"SELECT * FROM Pictures WHERE image_url IN ({','.join(['%s'] * len(file_names))})"
+        cursor.execute(query, file_names)
         query_results = cursor.fetchall()
 
         return {"result": query_results}
