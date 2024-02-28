@@ -19,7 +19,6 @@ def load_model_and_tokenizer() -> tuple[AutoModel, AutoTokenizer]:
     return model, tokenizer
 
 
-
 def get_secret(secret_name: str) -> dict:
     region_name = "us-east-1"
 
@@ -69,12 +68,16 @@ def get_similar_docs(
             }
         },
         {
-            "$vectorSearch": {
-                "vector": embedding,
-                "path": "caption_vector",
-                "similarity": "euclidean",
-                "k": k,
-                "efSearch": efSearch,
+            "$search": {
+                "vectorSearch": {
+                    {
+                        "vector": embedding,
+                        "path": "caption_vector",
+                        "similarity": "euclidean",
+                        "k": k,
+                        "efSearch": efSearch,
+                    }
+                }
             }
         },
         {
