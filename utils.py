@@ -84,7 +84,6 @@ def get_similar_docs(
             "$project": {
                 "_id": 0,
                 "file_name": 1,
-                "score": {"$meta": "vectorSearchScore"},
             }
         },
     ]
