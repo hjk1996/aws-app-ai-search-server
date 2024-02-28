@@ -70,13 +70,11 @@ def get_similar_docs(
         {
             "$search": {
                 "vectorSearch": {
-                    {
-                        "vector": embedding,
-                        "path": "caption_vector",
-                        "similarity": "euclidean",
-                        "k": k,
-                        "efSearch": efSearch,
-                    }
+                    "vector": embedding,
+                    "path": "caption_vector",
+                    "similarity": "euclidean",
+                    "k": k,
+                    "efSearch": efSearch,
                 }
             }
         },
