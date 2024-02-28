@@ -87,7 +87,9 @@ def get_similar_docs(
             }
         },
     ]
-    return collection.aggregate(pipeline)
+    cursor = collection.aggregate(pipeline)
+    return list(cursor)
+    
 
 
 def get_sentence_embedding(tokenizer, embedding_model, device, sentence: str) -> list:
