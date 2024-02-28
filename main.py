@@ -103,8 +103,10 @@ async def reset_face_index(request: Request):
         rekognition.create_collection(CollectionId=user_id)
         return {"status": "success"}
     except rekognition.exceptions.ResourceNotFoundException as e:
+        logger.error(e)
         raise HTTPException(status_code=404, detail="ResourceNotFoundException")
     except Exception as e:
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
