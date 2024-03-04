@@ -83,8 +83,8 @@ def get_similar_docs(
                 "_id": 0,
                 "file_name": 1,
                 "score": {
-                    "$meta": "searchScore",
-                }
+                    "$meta": "vectorSearchScore",
+                },
             }
         },
     ]
