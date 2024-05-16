@@ -1,17 +1,23 @@
 import os
-
-import mysql.connector
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from utils import get_secret
 
 
-def get_db() -> mysql.connector.MySQLConnection:
+# 환경변수에서 비밀 설정을 가져와서 SQLAlchemy 엔진을 생성
+def get_engine():
     mysql_config = get_secret(os.environ["MYSQL_SECRET_NAME"])
-    db = mysql.connector.connect(
-        host=mysql_config["host"],
-        user=mysql_config["username"],
-        password=mysql_config["password"],
-        database=mysql_config["dbname"],
-        connect_timeout=3000000,
+    # SQLAlchemy 연결 문자열 생성
+    connection_string = (
+        f"mysql+mysqlconnector://{mysql_config['username']}:{mysql_config['password']}@"
+        f"{mysql_config['host']}/{mysql_config['dbname']}?connect_timeout=3000"
     )
-    return db
+    engine = create_engine(connection_string, echo=True, pool_pre_ping=True)
+    return engine
+
+
+# SQLAlchemy 세션을 생성하여 반환
+def get_db():
+    engine = get_engine()
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    return SessionLocal()
